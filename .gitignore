@@ -30,3 +30,6 @@ metals.sbt
 .idea
 .idea_modules
 /.worksheet/
+
+# User specific
+src/main/resources/db.properties
