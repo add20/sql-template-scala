@@ -1,0 +1,24 @@
+<sql name="insert-user!">
+INSERT INTO users
+    ( users_id
+    , users_email
+    , users_password
+    , users_screen_name
+    ) VALUES
+    ( :users_id,
+    , :users_email
+    , :users_password
+    , :users_screen_name
+    )
+</sql>
+
+<sql name="select-user-by-email">
+SELECT * FROM users WHERE users_email = :users_email
+</sql>
+
+<sql name="update-user-screen-name!">
+UPDATE users SET
+    users_screen_name = :users_screen_name,
+    users_updated_at = current_timestamp
+WHERE users_id = :users_id
+</sql>
