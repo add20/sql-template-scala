@@ -1,4 +1,4 @@
-val scala3Version = "3.6.4"
+val scala3Version = "3.8.3"
 
 lazy val root = project
   .in(file("."))
@@ -8,5 +8,5 @@ lazy val root = project
     scalaVersion := scala3Version,
     libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    libraryDependencies += "org.postgresql" % "postgresql" % "42.7.5"
+    libraryDependencies += "org.postgresql" % "postgresql" % "42.7.11"
   )
