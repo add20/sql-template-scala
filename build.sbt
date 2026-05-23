@@ -8,5 +8,6 @@ lazy val root = project
     scalaVersion := scala3Version,
     libraryDependencies += "org.scalameta" %% "munit" % "1.0.0" % Test,
     // https://mvnrepository.com/artifact/org.postgresql/postgresql
-    libraryDependencies += "org.postgresql" % "postgresql" % "42.7.11"
+    libraryDependencies += "org.postgresql" % "postgresql" % "42.7.11",
+    libraryDependencies += "org.scala-lang.modules" %% "scala-xml" % "2.4.0"
   )

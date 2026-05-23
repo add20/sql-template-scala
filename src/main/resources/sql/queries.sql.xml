@@ -1,3 +1,5 @@
+<queries>
+
 <sql name="insert-user!">
 INSERT INTO users
     ( users_id
@@ -5,7 +7,7 @@ INSERT INTO users
     , users_password
     , users_screen_name
     ) VALUES
-    ( :users_id,
+    ( :users_id
     , :users_email
     , :users_password
     , :users_screen_name
@@ -22,3 +24,5 @@ UPDATE users SET
     users_updated_at = current_timestamp
 WHERE users_id = :users_id
 </sql>
+
+</queries>
