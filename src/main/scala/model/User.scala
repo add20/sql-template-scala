@@ -3,7 +3,6 @@ package model
 import java.sql.{Connection, Timestamp}
 import java.util.UUID
 
-import util.SqlResult
 import util.SqlTemplateExecutor
 
 case class User(

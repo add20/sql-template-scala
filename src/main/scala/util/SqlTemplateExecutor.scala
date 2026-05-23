@@ -5,8 +5,6 @@ import scala.xml.XML
 import scala.collection.mutable
 import java.io.InputStream
 
-import util.SqlResult
-
 object SqlTemplateExecutor:
 
   case class SqlQuery(name: String, raw: String, paramOrder: List[String], isUpdate: Boolean)
