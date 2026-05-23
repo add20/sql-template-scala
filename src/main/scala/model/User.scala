@@ -3,6 +3,7 @@ package model
 import java.sql.{Connection, Timestamp}
 import java.util.UUID
 
+import util.SqlResult
 import util.SqlTemplateExecutor
 
 case class User(
@@ -26,22 +27,21 @@ object User:
     id
 
   def selectUserByEmail(email: String)(using conn: Connection): Option[User] =
-    val rsOpt = SqlTemplateExecutor.execute("select-user-by-email", Map("users_email" -> email))
-    for {
-      rs <- rsOpt
-      if rs.next
-    } yield User(
-              UUID.fromString(rs.getString("users_id")),
-              rs.getString("users_email"),
-              rs.getString("users_password"),
-              Option(rs.getString("users_screen_name")),
-              rs.getTimestamp("users_created_at"),
-              rs.getTimestamp("users_updated_at")
-            )
+    val sqlResult = SqlTemplateExecutor.execute("select-user-by-email", Map("users_email" -> email))
+    val rs = sqlResult.getQueryResult
+    Option.when(rs.next)(User(
+        UUID.fromString(rs.getString("users_id")),
+        rs.getString("users_email"),
+        rs.getString("users_password"),
+        Option(rs.getString("users_screen_name")),
+        rs.getTimestamp("users_created_at"),
+        rs.getTimestamp("users_updated_at")
+      ))
 
   def updateUserScreenName(id: UUID, newName: String)(using conn: Connection): Boolean =
-    SqlTemplateExecutor.execute("update-user-screen-name!", Map(
+    val sqlResult = SqlTemplateExecutor.execute("update-user-screen-name!", Map(
       "users_id" -> id,
       "users_screen_name" -> newName
     ))
-    true
+    val rows = sqlResult.getUpdateResult
+    rows >= 1

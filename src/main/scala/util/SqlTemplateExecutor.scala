@@ -5,6 +5,8 @@ import scala.xml.XML
 import scala.collection.mutable
 import java.io.InputStream
 
+import util.SqlResult
+
 object SqlTemplateExecutor:
 
   case class SqlQuery(name: String, raw: String, paramOrder: List[String], isUpdate: Boolean)
@@ -29,17 +31,24 @@ object SqlTemplateExecutor:
     val replaced = regex.replaceAllIn(raw, "?")
     (replaced, paramOrder)
 
-  def execute(name: String, params: Map[String, Any])(using conn: Connection): Option[ResultSet] =
+  def execute(
+    name: String,
+    params: Map[String, Any]
+  )(using conn: Connection): SqlResult =
+
     queries.get(name) match
       case Some(query) =>
         val stmt = conn.prepareStatement(query.raw)
+
         for ((paramName, idx) <- query.paramOrder.zipWithIndex) do
           stmt.setObject(idx + 1, params(paramName))
+
         if query.isUpdate then
-          stmt.executeUpdate()
-          stmt.close
-          None
+          val updatedRows = stmt.executeUpdate()
+          stmt.close()
+          SqlResult.UpdateResult(updatedRows)
         else
-          Some(stmt.executeQuery())
+          SqlResult.QueryResult(stmt.executeQuery())
+
       case None =>
         throw new IllegalArgumentException(s"Query not found: $name")

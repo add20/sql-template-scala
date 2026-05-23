@@ -29,8 +29,9 @@ def insertUser(email: String, password: String, screenName: Option[String])(usin
     val user = User.selectUserByEmail("test4@example.com")
     println(user)
 
-    User.updateUserScreenName(
+    val bResult = User.updateUserScreenName(
       UUID.fromString("785ced97-6f79-4cb1-8e89-b8469516cb04")
     , "NEW テストユーザー3"
     )
+    println(s"bResult = ${bResult}")
   }
