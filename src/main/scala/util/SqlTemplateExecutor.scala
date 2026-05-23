@@ -31,24 +31,51 @@ object SqlTemplateExecutor:
     val replaced = regex.replaceAllIn(raw, "?")
     (replaced, paramOrder)
 
-  def execute(
-    name: String,
-    params: Map[String, Any]
-  )(using conn: Connection): SqlResult =
+  def execute[T]
+    (name: String, params: Map[String, Any])
+    (updateMapper: Int => T)
+    (resultSetMapper: ResultSet => T)
+    (using conn: Connection): T =
 
     queries.get(name) match
       case Some(query) =>
         val stmt = conn.prepareStatement(query.raw)
 
-        for ((paramName, idx) <- query.paramOrder.zipWithIndex) do
-          stmt.setObject(idx + 1, params(paramName))
+        try
+          for ((paramName, idx) <- query.paramOrder.zipWithIndex) do
+            stmt.setObject(idx + 1, params(paramName))
 
-        if query.isUpdate then
-          val updatedRows = stmt.executeUpdate()
-          stmt.close()
-          SqlResult.UpdateResult(updatedRows)
-        else
-          SqlResult.QueryResult(stmt.executeQuery())
+          if query.isUpdate then
+            val updatedRows = stmt.executeUpdate()
+            updateMapper(updatedRows)
+          else
+            val rs = stmt.executeQuery()
+
+            try
+              resultSetMapper(rs)
+            finally
+              rs.close
+        finally
+          stmt.close
 
       case None =>
         throw new IllegalArgumentException(s"Query not found: $name")
+
+  def executeUpdate
+    (name: String, params: Map[String, Any])
+    (using conn: Connection): Int =
+
+      execute
+        (name, params)
+        (identity)
+        (_ => throw new IllegalArgumentException("This is executeUpdate not executeQuery method."))
+
+  def executeQuery[T]
+    (name: String, params: Map[String, Any])
+    (resultSetMapper: ResultSet => T)
+    (using conn: Connection): T =
+
+    execute
+      (name, params)
+      (_ => throw new IllegalArgumentException("This is executeQuery not executeUpdate method."))
+      (resultSetMapper)
